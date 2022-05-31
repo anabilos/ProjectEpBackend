@@ -2,11 +2,9 @@ const db = require("../models");
 const User = db.User;
 
 const { validationResult } = require("express-validator");
-const { errorHandler } = require("../helpers/dbErrorHandling");
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
-const sgMail = require("@sendgrid/mail");
-sgMail.setApiKey(process.env.MAIL_KEY);
+const nodemailer = require("nodemailer");
 
 // username, email, address, password, confPass
 exports.signup = async (req, res) => {
@@ -166,46 +164,33 @@ exports.forgotPassword = (req, res) => {
             expiresIn: "20m",
           }
         );
-        const emailData = {
-          from: process.env.EMAIL_FROM,
-          to: email,
-          subject: "Reset password link",
-          html: `
-                      <h1>Please use the following link to reset your password</h1>
-                      <p>${process.env.CLIENT_URL}/resetpassword/${token}</p>
-                      <hr />
-                      <p>This email may contain sensetive information</p>
-                      <p>${process.env.CLIENT_URL}</p>`,
-        };
-        sgMail
-          .send(emailData)
-          .then((sent) => {
-            user
-              .update({ ResetLink: token })
-              .then(() => {
-                return res.status(200).send({
-                  success: true,
-                  message: `Email has been sent, kindly follow the instructions.`,
-                });
-              })
-              .catch((err) => {
-                return res.status(400).json({
-                  success: false,
-                  message: "Error updating user!",
-                });
+        const sent = sendEmail(email, token);
+        if (sent != "0") {
+          user
+            .update({ ResetLink: token })
+            .then(() => {
+              return res.status(200).send({
+                success: true,
+                message: "Email has been sent, kindly follow the instructions.",
               });
-          })
-          .catch((err) => {
-            return res.status(400).json({
-              success: false,
-              message: errorHandler(err),
+            })
+            .catch((err) => {
+              return res.status(400).json({
+                success: false,
+                message: "Error updating user!",
+              });
             });
+        } else {
+          return res.status(500).send({
+            success: false,
+            message: "Something goes to wrong. Please try again",
           });
+        }
       })
       .catch((err) => {
         res.status(500).send({
           success: false,
-          message: "Error retrieving user with given email!",
+          message: err.message,
         });
       });
   }
@@ -436,3 +421,40 @@ exports.getCurrentUser = (req, res) => {
 
   return res.status(200).send(user);
 };
+
+function sendEmail(email, token) {
+  var email = email;
+  var token = token;
+
+  var mail = nodemailer.createTransport({
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_FROM,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  var mailOptions = {
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Reset Password Link ",
+    html: ` <h1>Please use the following link to reset your password</h1>
+      <p>${process.env.CLIENT_URL}/resetpassword/${token}</p>
+      <hr />
+      <p>This email may contain sensetive information</p>`,
+  };
+
+  mail.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(0);
+    }
+  });
+}
