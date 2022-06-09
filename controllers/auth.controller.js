@@ -6,9 +6,9 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 
-// username, email, address, password, confPass
+// username, email, address, password, confPass, phone
 exports.signup = async (req, res) => {
-  const { username, email, address, confPass } = req.body;
+  const { username, email, address, confPass, phone } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
@@ -24,6 +24,7 @@ exports.signup = async (req, res) => {
       Email: email,
       Hashed_password: bcrypt.hashSync(req.body.password, 8),
       Address: address,
+      Phone: phone,
     })
       .then((user) => {
         if (req.body.roles) {
@@ -316,9 +317,9 @@ exports.changePassword = (req, res) => {
   }
 };
 
-//  username, address-optional, email
+//  username, address-optional, email, phone
 exports.editAccount = (req, res) => {
-  const { username, address, email } = req.body;
+  const { username, address, email, phone } = req.body;
   const id = req.id;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -334,7 +335,12 @@ exports.editAccount = (req, res) => {
           });
         }
         user
-          .update({ Username: username, Address: address, Email: email })
+          .update({
+            Username: username,
+            Address: address,
+            Email: email,
+            Phone: phone,
+          })
           .then(() => {
             return res.status(200).send({
               success: true,

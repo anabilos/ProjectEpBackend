@@ -6,6 +6,7 @@ const {
   getMyOrders,
   getAllOrdersBasedOnProductId,
   updateOrderStatusToTaken,
+  getMyOrdersDetails,
 } = require("../controllers/orders.controller");
 const {
   addOrderValidate,
@@ -20,6 +21,7 @@ router.post(
   create
 );
 router.get("/orders", authJwt.verifyToken, getMyOrders);
+router.get("/orders/:id", authJwt.verifyToken, getMyOrdersDetails);
 router.get(
   "/get-product-orders/:productId",
   authJwt.verifyToken,

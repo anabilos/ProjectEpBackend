@@ -125,3 +125,25 @@ exports.getMyOrders = (req, res) => {
       });
     });
 };
+
+exports.getMyOrdersDetails = (req, res) => {
+  const { id } = req.params;
+  Order.findOne({
+    where: { Id: id },
+    include: [
+      {
+        model: Product,
+        attributes: ["Id", "Name", "Photo", "Expire", "Description"],
+      },
+    ],
+  })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};

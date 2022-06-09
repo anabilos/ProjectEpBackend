@@ -7,6 +7,12 @@ const productValidate = {
     },
     isString: { errorMessage: "Name should be string" },
   },
+  description: {
+    exists: {
+      errorMessage: "Description is required",
+    },
+    isString: { errorMessage: "Description should be string" },
+  },
   itemsLeft: {
     exists: {
       errorMessage: "ItemsLeft is required",

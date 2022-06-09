@@ -41,21 +41,6 @@ exports.getAll = (req, res) => {
     });
 };
 
-exports.getOne = (req, res) => {
-  const { id } = req.params;
-
-  Category.findByPk(id)
-    .then((data) => {
-      res.status(200).send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        success: false,
-        message: err.message,
-      });
-    });
-};
-
 // name
 exports.update = (req, res) => {
   const { name } = req.body;

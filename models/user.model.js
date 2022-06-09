@@ -16,6 +16,11 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: true,
     },
+    Phone: {
+      type: Sequelize.STRING(9),
+      allowNull: false,
+      unique: true,
+    },
     Hashed_password: {
       type: Sequelize.STRING,
       allowNull: false,

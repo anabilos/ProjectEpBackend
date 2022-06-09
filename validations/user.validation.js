@@ -27,6 +27,10 @@ const userSignUpValidate = {
   address: {
     isString: { errorMessage: "Address should be string" },
   },
+  phone: {
+    exists: { errorMessage: "Phone is required" },
+    isString: { errorMessage: "Phone should be string" },
+  },
 };
 
 const userSignInValidate = {
@@ -91,6 +95,10 @@ const userEditAccountValidate = {
   email: {
     exists: { errorMessage: "Email is required" },
     isEmail: { errorMessage: "Please provide valid email" },
+  },
+  phone: {
+    exists: { errorMessage: "Phone is required" },
+    isString: { errorMessage: "Phone should be string" },
   },
   address: {
     isString: { errorMessage: "Address should be string" },

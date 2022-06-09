@@ -5,7 +5,7 @@ const Op = db.Sequelize.Op;
 
 exports.getAllUsers = (req, res) => {
   User.findAll({
-    attributes: ["Username", "Email", "Address"],
+    attributes: ["Username", "Email", "Address", "Phone"],
     include: [Role],
   })
     .then((data) => {

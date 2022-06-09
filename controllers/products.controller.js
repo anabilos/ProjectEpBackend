@@ -6,9 +6,9 @@ const { Sequelize } = require("sequelize");
 const Op = db.Sequelize.Op;
 const { validationResult } = require("express-validator");
 
-// name, itemsLeft, categoryId, productImage
+// name, itemsLeft, categoryId, productImage, description
 exports.create = (req, res) => {
-  const { name, itemsLeft, categoryId } = req.body;
+  const { name, itemsLeft, categoryId, description } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
@@ -20,6 +20,7 @@ exports.create = (req, res) => {
       CategoryId: categoryId,
       Photo: req.file.path,
       UserId: req.id,
+      Description: description,
     })
       .then(() => {
         res.status(200).send({
@@ -52,7 +53,19 @@ exports.getMyProducts = (req, res) => {
 
 exports.getOne = (req, res) => {
   const { id } = req.params;
-  Product.findOne({ where: { Id: id }, include: [Category, User] })
+  Product.findOne({
+    where: { Id: id },
+    include: [
+      {
+        model: Category,
+        attributes: ["Name"],
+      },
+      {
+        model: User,
+        attributes: ["Username", "Address", "Email"],
+      },
+    ],
+  })
     .then((data) => {
       res.status(200).send(data);
     })
@@ -64,7 +77,7 @@ exports.getOne = (req, res) => {
     });
 };
 exports.getAll = (req, res) => {
-  Product.findAll({ include: [Category, User] })
+  Product.findAll({ include: [Category] })
     .then((data) => {
       res.status(200).send(data);
     })
@@ -76,9 +89,9 @@ exports.getAll = (req, res) => {
     });
 };
 
-// name, itemsLeft, categoryId, productImage
+// name, itemsLeft, categoryId, productImage, description
 exports.update = (req, res) => {
-  const { name, itemsLeft, categoryId } = req.body;
+  const { name, itemsLeft, categoryId, description } = req.body;
   const { id } = req.params;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -92,6 +105,7 @@ exports.update = (req, res) => {
         CategoryId: categoryId,
         UserId: req.id,
         Photo: req.file.path,
+        Description: description,
       },
       {
         where: { Id: id },
