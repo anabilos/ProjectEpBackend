@@ -6,7 +6,6 @@ const {
   logout,
   forgotPassword,
   resetPassword,
-  addToOrganizer,
   changePassword,
   editAccount,
   getCurrentUser,
@@ -51,11 +50,6 @@ module.exports = function (app) {
     "/api/reset-password",
     [checkSchema(userResetPassValidate)],
     resetPassword
-  );
-  app.put(
-    "/api/addtoorganizer",
-    [authJwt.verifyToken, authJwt.isAdmin],
-    addToOrganizer
   );
   app.put(
     "/api/change-password",

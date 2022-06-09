@@ -1,7 +1,7 @@
 const { body } = require("express-validator");
 
 const categoryNameValidate = {
-  username: {
+  name: {
     exists: {
       errorMessage: "Name is required",
     },

@@ -7,17 +7,17 @@ const productValidate = {
     },
     isString: { errorMessage: "Name should be string" },
   },
-  quantity: {
+  itemsLeft: {
     exists: {
-      errorMessage: "Quantity is required",
+      errorMessage: "ItemsLeft is required",
     },
-    isInt: { errorMessage: "Quantity should be int" },
+    isInt: { errorMessage: "ItemsLeft should be int" },
   },
-  measure: {
+  expire: {
     exists: {
-      errorMessage: "Measure is required",
+      errorMessage: "Expire is required",
     },
-    isString: { errorMessage: "Measure should be string" },
+    isDate: { errorMessage: "Expire should be date" },
   },
   categoryId: {
     exists: {

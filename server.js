@@ -32,10 +32,12 @@ require("./routes/auth.route")(app);
 const userRoute = require("./routes/users.route");
 const categoryRoute = require("./routes/category.route");
 const productRoute = require("./routes/product.route");
-
+const orderRoute = require("./routes/order.route");
+app.use("/uploads", express.static("uploads"));
 app.use("/api", productRoute);
 app.use("/api", userRoute);
 app.use("/api", categoryRoute);
+app.use("/api", orderRoute);
 
 app.use((req, res, next) => {
   res.status(404).json({
@@ -56,7 +58,7 @@ function initial() {
 
   Role.create({
     Id: 2,
-    Name: "organizer",
+    Name: "provider",
   });
 
   Role.create({

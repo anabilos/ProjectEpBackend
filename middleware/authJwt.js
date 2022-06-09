@@ -37,20 +37,20 @@ isAdmin = (req, res, next) => {
   return;
 };
 
-isOrganizer = (req, res, next) => {
-  if (req.role.includes("organizer")) {
+isProvider = (req, res, next) => {
+  if (req.role.includes("provider")) {
     next();
     return;
   }
   res.status(403).send({
     success: false,
-    message: "Require Organizer Role!",
+    message: "Require Provider Role!",
   });
 };
 
 const authJwt = {
   isAdmin: isAdmin,
-  isOrganizer: isOrganizer,
+  isProvider: isProvider,
   verifyToken: verifyToken,
 };
 

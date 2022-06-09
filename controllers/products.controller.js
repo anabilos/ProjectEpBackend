@@ -1,12 +1,14 @@
 const db = require("../models");
 const Product = db.Product;
 const Category = db.Category;
+const User = db.User;
+const { Sequelize } = require("sequelize");
 const Op = db.Sequelize.Op;
 const { validationResult } = require("express-validator");
 
-// name, quantity, measure, categoryId
+// name, itemsLeft, categoryId, productImage
 exports.create = (req, res) => {
-  const { name, quantity, measure, categoryId } = req.body;
+  const { name, itemsLeft, categoryId } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
@@ -14,9 +16,10 @@ exports.create = (req, res) => {
   } else {
     Product.create({
       Name: name,
-      Quantity: quantity,
-      Measure: measure,
+      ItemsLeft: itemsLeft,
       CategoryId: categoryId,
+      Photo: req.file.path,
+      UserId: req.id,
     })
       .then(() => {
         res.status(200).send({
@@ -33,8 +36,9 @@ exports.create = (req, res) => {
   }
 };
 
-exports.getAll = (req, res) => {
-  Product.findAll({ include: Category })
+//provider products
+exports.getMyProducts = (req, res) => {
+  Product.findAll({ where: { UserId: req.id }, include: [Category] })
     .then((data) => {
       res.status(200).send(data);
     })
@@ -48,7 +52,7 @@ exports.getAll = (req, res) => {
 
 exports.getOne = (req, res) => {
   const { id } = req.params;
-  Product.findOne({ where: { Id: id }, include: Category })
+  Product.findOne({ where: { Id: id }, include: [Category, User] })
     .then((data) => {
       res.status(200).send(data);
     })
@@ -59,9 +63,22 @@ exports.getOne = (req, res) => {
       });
     });
 };
-// name, quantity, measure, categoryId
+exports.getAll = (req, res) => {
+  Product.findAll({ include: [Category, User] })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+// name, itemsLeft, categoryId, productImage
 exports.update = (req, res) => {
-  const { name, quantity, measure, categoryId } = req.body;
+  const { name, itemsLeft, categoryId } = req.body;
   const { id } = req.params;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -71,13 +88,13 @@ exports.update = (req, res) => {
     Product.update(
       {
         Name: name,
-        Quantity: quantity,
-        Measure: measure,
+        ItemsLeft: itemsLeft,
         CategoryId: categoryId,
+        UserId: req.id,
+        Photo: req.file.path,
       },
       {
         where: { Id: id },
-        include: Category,
       }
     )
       .then(() => {
@@ -96,17 +113,70 @@ exports.update = (req, res) => {
 };
 
 exports.deleteOne = (req, res) => {
-  const { id } = req.params;
+  const { idProduct } = req.params;
 
   Product.destroy({
-    where: { Id: id },
-    include: Category,
+    where: { Id: idProduct },
   })
     .then(() => {
       res.status(200).send({
         success: true,
         message: "Product deleted successfully!",
       });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+exports.updateProductStatus = (req, res) => {
+  const { id } = req.body;
+
+  Product.findOne({ where: { Id: id } })
+    .then((data) => {
+      data
+        .update({ Status: !data.Status })
+        .then(() => {
+          res.status(200).send({
+            success: true,
+            message: "Status changed successfully!",
+          });
+        })
+        .catch((err) => {
+          res.status(500).send({
+            success: false,
+            message: err.message,
+          });
+        });
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+exports.searchProductsForCategory = (req, res) => {
+  const { idCategory } = req.params;
+  Product.findAll({
+    where: { CategoryId: idCategory },
+    include: [
+      {
+        model: Category,
+        attributes: ["Name"],
+      },
+      {
+        model: User,
+        attributes: ["Username", "Address"],
+      },
+    ],
+  })
+    .then((data) => {
+      res.status(200).send(data);
     })
     .catch((err) => {
       res.status(500).send({

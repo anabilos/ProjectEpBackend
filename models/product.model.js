@@ -10,13 +10,21 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.STRING(100),
       allowNull: false,
     },
-    Quantity: {
+    ItemsLeft: {
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    Measure: {
-      type: Sequelize.STRING(100),
+    Photo: {
+      type: Sequelize.STRING,
       allowNull: false,
+    },
+    Expire: {
+      type: Sequelize.DATE,
+      allowNull: false,
+    },
+    Status: {
+      type: Sequelize.BOOLEAN,
+      defaultValue: true,
     },
   });
 
