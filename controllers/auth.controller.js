@@ -38,7 +38,7 @@ exports.signup = async (req, res) => {
             user.setRoles(roles).then(() => {
               res.status(200).send({
                 success: true,
-                message: "User was registered successfully!",
+                message: "User registered successfully!",
               });
             });
           });
@@ -47,7 +47,7 @@ exports.signup = async (req, res) => {
           user.setRoles([1]).then(() => {
             res.status(200).send({
               success: true,
-              message: "User was registered successfully!",
+              message: "User registered successfully!",
             });
           });
         }
@@ -317,7 +317,7 @@ exports.changePassword = (req, res) => {
   }
 };
 
-//  username, address-optional, email, phone
+//  username, address, email, phone
 exports.editAccount = (req, res) => {
   const { username, address, email, phone } = req.body;
   const id = req.id;

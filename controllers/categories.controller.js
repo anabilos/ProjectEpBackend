@@ -50,19 +50,25 @@ exports.update = (req, res) => {
     const firstError = errors.array().map((error) => error.msg)[0];
     return res.status(422).json({ success: false, message: firstError });
   } else {
-    Category.update(
-      { Name: name },
-      {
-        where: { Id: id },
-      }
-    )
-      .then(() => {
-        res.status(200).send({
-          success: true,
-          message: "Category updated successfully!",
-        });
+    Category.findOne({
+      where: { Id: id },
+    })
+      .then((data) => {
+        if (data == null) {
+          res.status(404).send({
+            success: false,
+            message: "Category not found!",
+          });
+        } else {
+          data.update({ Name: name });
+          res.status(200).send({
+            success: true,
+            message: "Category updated successfully!",
+          });
+        }
       })
       .catch((err) => {
+        console.log(err);
         res.status(500).send({
           success: false,
           message: err.message,
@@ -77,11 +83,18 @@ exports.deleteOne = (req, res) => {
   Category.destroy({
     where: { Id: id },
   })
-    .then(() => {
-      res.status(200).send({
-        success: true,
-        message: "Category deleted successfully!",
-      });
+    .then((data) => {
+      if (data == 0) {
+        res.status(404).send({
+          success: false,
+          message: "Category not found!",
+        });
+      } else {
+        res.status(200).send({
+          success: true,
+          message: "Category deleted successfully!",
+        });
+      }
     })
     .catch((err) => {
       res.status(500).send({

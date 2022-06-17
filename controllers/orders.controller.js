@@ -18,6 +18,12 @@ exports.create = async (req, res) => {
     return res.status(422).json({ success: false, message: firstError });
   } else {
     let prod = await Product.findOne({ where: { Id: product.id } });
+    if (prod == null) {
+      res.status(404).send({
+        success: false,
+        message: "Product not found!",
+      });
+    }
     if (prod.dataValues.ItemsLeft - product.quantity < 0) {
       res.status(500).send({
         success: false,
@@ -78,24 +84,31 @@ exports.getAllOrdersBasedOnProductId = (req, res) => {
     });
 };
 exports.updateOrderStatusToTaken = (req, res) => {
-  const { orderId } = req.body;
+  const { orderId } = req.params;
 
   Order.findOne({ where: { Id: orderId } })
     .then((data) => {
-      data
-        .update({ Status: true })
-        .then(() => {
-          res.status(200).send({
-            success: true,
-            message: "Order taken successfully!",
-          });
-        })
-        .catch((err) => {
-          res.status(500).send({
-            success: false,
-            message: err.message,
-          });
+      if (data == null) {
+        res.status(404).send({
+          success: false,
+          message: "Order not found!",
         });
+      } else {
+        data
+          .update({ Status: true })
+          .then(() => {
+            res.status(200).send({
+              success: true,
+              message: "Order taken successfully!",
+            });
+          })
+          .catch((err) => {
+            res.status(500).send({
+              success: false,
+              message: err.message,
+            });
+          });
+      }
     })
     .catch((err) => {
       res.status(500).send({
@@ -138,7 +151,14 @@ exports.getMyOrdersDetails = (req, res) => {
     ],
   })
     .then((data) => {
-      res.status(200).send(data);
+      if (data == null) {
+        res.status(404).send({
+          success: false,
+          message: "Order not found!",
+        });
+      } else {
+        res.status(200).send(data);
+      }
     })
     .catch((err) => {
       res.status(500).send({

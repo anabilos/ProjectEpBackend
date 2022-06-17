@@ -2,6 +2,8 @@ const db = require("../models");
 const User = db.User;
 const Role = db.Role;
 const Op = db.Sequelize.Op;
+const nodemailer = require("nodemailer");
+const { validationResult } = require("express-validator");
 
 exports.getAllUsers = (req, res) => {
   User.findAll({
@@ -20,8 +22,9 @@ exports.getAllUsers = (req, res) => {
 };
 
 // email
-exports.addToOrganizer = (req, res) => {
+exports.addToProvider = (req, res) => {
   const { email } = req.body;
+  console.log(email);
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
@@ -31,6 +34,7 @@ exports.addToOrganizer = (req, res) => {
       where: { Email: email },
     })
       .then((user) => {
+        console.log(user);
         if (!user) {
           return res.status(404).send({
             success: false,
@@ -67,7 +71,7 @@ exports.addToOrganizer = (req, res) => {
       .catch((err) => {
         res.status(500).send({
           success: false,
-          message: "Error retrieving user with given id!",
+          message: "Error retrieving user with given email!",
         });
       });
   }
@@ -79,11 +83,18 @@ exports.deleteOne = (req, res) => {
   User.destroy({
     where: { Id: id },
   })
-    .then(() => {
-      res.status(200).send({
-        success: true,
-        message: "User deleted successfully!",
-      });
+    .then((data) => {
+      if (data == 0) {
+        res.status(404).send({
+          success: false,
+          message: "User not found!",
+        });
+      } else {
+        res.status(200).send({
+          success: true,
+          message: "User deleted successfully!",
+        });
+      }
     })
     .catch((err) => {
       res.status(500).send({
@@ -92,3 +103,56 @@ exports.deleteOne = (req, res) => {
       });
     });
 };
+
+exports.sendMailToAdmin = (req, res) => {
+  const sent = sendEmail(req.id, req.username, req.email);
+  if (sent != "0") {
+    return res.status(200).send({
+      success: true,
+      message: "Email has been sent to admin.",
+    });
+  } else {
+    return res.status(500).send({
+      success: false,
+      message: "Something went wrong. Please try again",
+    });
+  }
+};
+
+function sendEmail(id, username, email) {
+  var email = email;
+  var id = id;
+  var username = username;
+
+  var mail = nodemailer.createTransport({
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_FROM,
+      pass: process.env.EMAIL_PASS,
+    },
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  var mailOptions = {
+    from: { name: username, address: email },
+    to: process.env.EMAIL_FROM,
+    subject: "Role update",
+    html: ` 
+      <p>Request from user ${username} with id ${id} to update his role to organizer.</p>
+      <hr />
+      <p>Thanks in advance!</p>`,
+  };
+
+  mail.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log(0);
+    }
+  });
+}

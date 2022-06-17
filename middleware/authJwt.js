@@ -3,7 +3,15 @@ const db = require("../models");
 const User = db.User;
 
 verifyToken = (req, res, next) => {
-  let token = req.cookies["token"];
+  const bearerHeader = req.headers["authorization"];
+  let token;
+  if (typeof bearerHeader !== "undefined") {
+    const bearer = bearerHeader.split(" ");
+    const bearerToken = bearer[1];
+    token = bearerToken;
+  } else {
+    token = req.cookies["token"];
+  }
   if (!token) {
     return res.status(403).send({
       success: false,
