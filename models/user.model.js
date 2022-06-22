@@ -28,7 +28,14 @@ module.exports = (sequelize, Sequelize) => {
     Address: {
       type: Sequelize.STRING(100),
       allowNull: true,
-      unique: true,
+    },
+    Photo: {
+      type: Sequelize.STRING,
+      allowNull: true,
+    },
+    Description: {
+      type: Sequelize.STRING,
+      allowNull: true,
     },
     ResetLink: {
       type: Sequelize.STRING,

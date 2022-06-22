@@ -7,6 +7,9 @@ const {
   getAllUsers,
   deleteOne,
   sendMailToAdmin,
+  getAllProviders,
+  getProvidersDetails,
+  searchProvidersByCategory,
 } = require("../controllers/users.controller");
 
 /**
@@ -33,6 +36,47 @@ const {
 router.get("/users", [authJwt.verifyToken, authJwt.isAdmin], getAllUsers);
 
 /**
+ *@swagger
+ * /providers:
+ *   get:
+ *     summary: Returns all providers
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: the list of the providers
+ *       500:
+ *         description: internal server error
+ */
+
+router.get("/providers", getAllProviders);
+
+/**
+ * @swagger
+ * /providers/{id}:
+ *     get:
+ *       summary: Provider details
+ *       tags: [Users]
+ *       parameters:
+ *         - in: path
+ *           name: id
+ *           schema:
+ *             type: integer
+ *           required: true
+ *           description: The provider id
+ *       responses:
+ *         200:
+ *           description: provider details
+ *         404:
+ *           description: provider not found
+ *         500:
+ *            description: internal server error
+ */
+
+router.get("/providers/:id", getProvidersDetails);
+
+/**
  * @swagger
  * /users/{id}:
  *   delete:
@@ -55,6 +99,33 @@ router.get("/users", [authJwt.verifyToken, authJwt.isAdmin], getAllUsers);
  *          500:
  *            description: internal server error
  */
+
+/**
+ * @swagger
+ * /search-providers-by-category/{idCategory}:
+ *     get:
+ *       summary: Gets all providers by category id
+ *       tags: [Users]
+ *       parameters:
+ *         - in: path
+ *           name: idCategory
+ *           schema:
+ *             type: integer
+ *           required: true
+ *           description: The category id
+ *       responses:
+ *         200:
+ *           description: the list of providers by category
+ *         404:
+ *           description: no providers from that category
+ *         500:
+ *            description: internal server error
+ */
+
+router.get(
+  "/search-providers-by-category/:idCategory",
+  searchProvidersByCategory
+);
 
 router.delete("/users/:id", [authJwt.verifyToken, authJwt.isAdmin], deleteOne);
 

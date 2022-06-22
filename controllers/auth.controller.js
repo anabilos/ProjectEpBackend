@@ -6,14 +6,18 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 
-// username, email, address, password, confPass, phone
+// username, email, address, password, confPass, phone, photo, description
 exports.signup = async (req, res) => {
-  const { username, email, address, confPass, phone } = req.body;
+  const { username, email, address, confPass, phone, description } = req.body;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     const firstError = errors.array().map((error) => error.msg)[0];
     return res.status(422).json({ success: false, message: firstError });
   } else {
+    let photo = "";
+    if (req.file != null) {
+      photo = req.file.path;
+    }
     if (req.body.password !== confPass)
       return res.status(400).send({
         success: false,
@@ -25,6 +29,8 @@ exports.signup = async (req, res) => {
       Hashed_password: bcrypt.hashSync(req.body.password, 8),
       Address: address,
       Phone: phone,
+      Description: description,
+      Photo: photo,
     })
       .then((user) => {
         if (req.body.roles) {
@@ -317,9 +323,14 @@ exports.changePassword = (req, res) => {
   }
 };
 
-//  username, address, email, phone
+//  username, address, email, phone, photo, description
 exports.editAccount = (req, res) => {
-  const { username, address, email, phone } = req.body;
+  const { username, address, email, phone, description } = req.body;
+  let photo = "";
+  if (!req.file == null) {
+    photo = req.file.path;
+  }
+  console.log(photo);
   const id = req.id;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -340,6 +351,8 @@ exports.editAccount = (req, res) => {
             Address: address,
             Email: email,
             Phone: phone,
+            Description: description,
+            Photo: photo,
           })
           .then(() => {
             return res.status(200).send({

@@ -2,8 +2,11 @@ const db = require("../models");
 const User = db.User;
 const Role = db.Role;
 const Op = db.Sequelize.Op;
+const Product = db.Product;
 const nodemailer = require("nodemailer");
 const { validationResult } = require("express-validator");
+const { Category } = require("../models");
+const sequlize = require("sequelize");
 
 exports.getAllUsers = (req, res) => {
   User.findAll({
@@ -12,6 +15,94 @@ exports.getAllUsers = (req, res) => {
   })
     .then((data) => {
       res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+exports.getAllProviders = (req, res) => {
+  User.findAll({
+    attributes: ["Username", "Email", "Address", "Phone", "Photo"],
+    include: [
+      {
+        model: Role,
+        where: { Name: "provider" },
+        attributes: ["Name"],
+      },
+    ],
+  })
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+exports.getProvidersDetails = (req, res) => {
+  const { id } = req.params;
+  User.findOne({
+    attributes: [
+      "Username",
+      "Email",
+      "Address",
+      "Phone",
+      "Photo",
+      "Description",
+    ],
+    where: {
+      Id: id,
+    },
+    include: [
+      { model: Product, include: [{ model: Category, attributes: ["Name"] }] },
+    ],
+  })
+    .then((user) => {
+      if (!user)
+        return res.status(404).send({
+          success: false,
+          message: "User not found",
+        });
+      else {
+        res.status(200).send(user);
+      }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+exports.searchProvidersByCategory = (req, res) => {
+  const { idCategory } = req.params;
+  User.findAll({
+    attributes: ["Username", "Email", "Address", "Phone", "Photo"],
+    include: [
+      {
+        model: Product,
+        attributes: [],
+        where: { CategoryId: idCategory },
+      },
+    ],
+  })
+    .then((data) => {
+      if (data.length == 0) {
+        res.status(404).send({
+          success: false,
+          message: "No providers from that category!",
+        });
+      } else {
+        res.status(200).send(data);
+      }
     })
     .catch((err) => {
       res.status(500).send({

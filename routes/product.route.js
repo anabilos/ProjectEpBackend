@@ -11,7 +11,7 @@ const {
   update,
   deleteOne,
   updateProductStatus,
-  searchProductsForCategory,
+  searchProductsByCategory,
   getMyProducts,
 } = require("../controllers/products.controller");
 const { productValidate } = require("../validations/product.validation");
@@ -174,10 +174,7 @@ router.get(
  *            description: internal server error
  */
 
-router.get(
-  "/search-product-by-category/:idCategory",
-  searchProductsForCategory
-);
+router.get("/search-product-by-category/:idCategory", searchProductsByCategory);
 
 /**
  * @swagger

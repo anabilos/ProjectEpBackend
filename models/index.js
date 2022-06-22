@@ -36,6 +36,7 @@ db.User.belongsToMany(db.Role, {
   foreignKey: "userId",
   otherKey: "roleId",
 });
+
 db.Category.hasMany(db.Product);
 db.Product.belongsTo(db.Category);
 db.User.hasMany(db.Product);

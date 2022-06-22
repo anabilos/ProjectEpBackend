@@ -1,5 +1,6 @@
 const { verifySignUp, authJwt } = require("../middleware");
 const { checkSchema } = require("express-validator");
+const { upload } = require("../lib/multer");
 const {
   signup,
   signin,
@@ -76,11 +77,37 @@ module.exports = function (app) {
    *     summary: Register new user
    *     tags: [Auth]
    *     requestBody:
-   *       required: true
    *       content:
-   *          application/json:
+   *         multipart/form-data:
    *           schema:
-   *             $ref: '#/definitions/User'
+   *             type: object
+   *             required:
+   *               - username
+   *               - email
+   *               - phone
+   *               - password
+   *               - confPass
+   *             properties:
+   *               username:
+   *                 type: string
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               address:
+   *                 type: string
+   *               phone:
+   *                 type: string
+   *               password:
+   *                 type: string
+   *                 format: password
+   *               confPass:
+   *                 type: string
+   *                 format: password
+   *               photo:
+   *                 type: string
+   *                 format: binary
+   *               description:
+   *                 type: string
    *     responses:
    *       200:
    *         description: user registered successfully
@@ -90,6 +117,8 @@ module.exports = function (app) {
 
   app.post(
     "/signup",
+
+    upload.single("photo"),
     [
       checkSchema(userSignUpValidate),
       verifySignUp.checkDuplicateUsernameOrEmail,
@@ -262,40 +291,50 @@ module.exports = function (app) {
     [authJwt.verifyToken, checkSchema(userChangePassValidate)],
     changePassword
   );
+
   /**
    * @swagger
    * /edit-account:
    *   put:
-   *       security:
-   *         - bearerAuth: []
-   *       summary: Edit account
-   *       tags: [Auth]
-   *       requestBody:
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                username:
-   *                  type: string
-   *                address:
-   *                  type: string
-   *                email:
-   *                  type: string
-   *                  format: email
-   *                phone:
-   *                  type: string
-   *       responses:
-   *         200:
-   *           description: success
-   *         404:
-   *           description: user not found
-   *         500:
-   *           description: internal server error
+   *     security:
+   *       - bearerAuth: []
+   *     summary: Edit account
+   *     tags: [Auth]
+   *     requestBody:
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - username
+   *               - email
+   *               - phone
+   *             properties:
+   *               username:
+   *                 type: string
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               address:
+   *                 type: string
+   *               phone:
+   *                 type: string
+   *               photo:
+   *                 type: string
+   *                 format: binary
+   *               description:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: success
+   *       404:
+   *         description: user not found
+   *       500:
+   *         description: internal server error
    */
-
   app.put(
     "/edit-account",
+    upload.single("photo"),
     [authJwt.verifyToken, checkSchema(userEditAccountValidate)],
     editAccount
   );

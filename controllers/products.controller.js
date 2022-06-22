@@ -213,7 +213,7 @@ exports.updateProductStatus = (req, res) => {
     });
 };
 
-exports.searchProductsForCategory = (req, res) => {
+exports.searchProductsByCategory = (req, res) => {
   const { idCategory } = req.params;
   Product.findAll({
     where: { CategoryId: idCategory },
