@@ -323,14 +323,60 @@ exports.changePassword = (req, res) => {
   }
 };
 
+//  username, address, email, phone
+exports.editAccountUser = (req, res) => {
+  const { username, address, email, phone } = req.body;
+
+  const id = req.id;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const firstError = errors.array().map((error) => error.msg)[0];
+    return res.status(422).json({ success: false, message: firstError });
+  } else {
+    User.findByPk(id)
+      .then((user) => {
+        if (!user) {
+          return res.status(404).send({
+            success: false,
+            message: "User with this id does not exist!",
+          });
+        }
+        user
+          .update({
+            Username: username,
+            Address: address,
+            Email: email,
+            Phone: phone,
+          })
+          .then(() => {
+            return res.status(200).send({
+              success: true,
+              message: "Account updated successfully.",
+            });
+          })
+          .catch((err) => {
+            res.status(500).send({
+              success: false,
+              message: "Error updating user!",
+            });
+          });
+      })
+      .catch((err) => {
+        res.status(500).send({
+          success: false,
+          message: "Error retrieving user with given id!",
+        });
+      });
+  }
+};
+
 //  username, address, email, phone, photo, description
-exports.editAccount = (req, res) => {
+exports.editAccountProvider = (req, res) => {
   const { username, address, email, phone, description } = req.body;
   let photo = "";
   if (!req.file == null) {
     photo = req.file.path;
   }
-  console.log(photo);
   const id = req.id;
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -375,7 +421,6 @@ exports.editAccount = (req, res) => {
       });
   }
 };
-
 exports.getCurrentUser = (req, res) => {
   const user = {
     Id: req.id,

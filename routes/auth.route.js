@@ -8,8 +8,9 @@ const {
   forgotPassword,
   resetPassword,
   changePassword,
-  editAccount,
   getCurrentUser,
+  editAccountUser,
+  editAccountProvider,
 } = require("../controllers/auth.controller");
 
 const {
@@ -19,6 +20,7 @@ const {
   userResetPassValidate,
   userChangePassValidate,
   userEditAccountValidate,
+  providerEditAccountValidate,
 } = require("../validations/user.validation");
 
 module.exports = function (app) {
@@ -294,11 +296,52 @@ module.exports = function (app) {
 
   /**
    * @swagger
-   * /edit-account:
+   * /edit-account-user:
    *   put:
    *     security:
    *       - bearerAuth: []
-   *     summary: Edit account
+   *     summary: Edit account user
+   *     tags: [Auth]
+   *     requestBody:
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             required:
+   *               - username
+   *               - email
+   *               - phone
+   *             properties:
+   *               username:
+   *                 type: string
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               address:
+   *                 type: string
+   *               phone:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: success
+   *       404:
+   *         description: user not found
+   *       500:
+   *         description: internal server error
+   */
+  app.put(
+    "/edit-account-user",
+    [authJwt.verifyToken, checkSchema(userEditAccountValidate)],
+    editAccountUser
+  );
+
+  /**
+   * @swagger
+   * /edit-account-provider:
+   *   put:
+   *     security:
+   *       - bearerAuth: []
+   *     summary: Edit account provider
    *     tags: [Auth]
    *     requestBody:
    *       content:
@@ -332,10 +375,15 @@ module.exports = function (app) {
    *       500:
    *         description: internal server error
    */
+
   app.put(
-    "/edit-account",
+    "/edit-account-provider",
     upload.single("photo"),
-    [authJwt.verifyToken, checkSchema(userEditAccountValidate)],
-    editAccount
+    [
+      authJwt.verifyToken,
+      authJwt.isProvider,
+      checkSchema(providerEditAccountValidate),
+    ],
+    editAccountProvider
   );
 };

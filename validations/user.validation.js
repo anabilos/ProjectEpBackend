@@ -84,6 +84,30 @@ const userChangePassValidate = {
   },
 };
 
+const providerEditAccountValidate = {
+  username: {
+    exists: {
+      errorMessage: "Username is required",
+      options: { checkFalsy: true },
+    },
+    isString: { errorMessage: "Username should be string" },
+  },
+  email: {
+    exists: { errorMessage: "Email is required" },
+    isEmail: { errorMessage: "Please provide valid email" },
+  },
+  phone: {
+    exists: { errorMessage: "Phone is required" },
+    isString: { errorMessage: "Phone should be string" },
+  },
+  address: {
+    isString: { errorMessage: "Address should be string" },
+  },
+  description: {
+    isString: { errorMessage: "Description should be string" },
+  },
+};
+
 const userEditAccountValidate = {
   username: {
     exists: {
@@ -110,5 +134,6 @@ module.exports = {
   userForgotPassValidate,
   userResetPassValidate,
   userChangePassValidate,
+  providerEditAccountValidate,
   userEditAccountValidate,
 };
