@@ -11,7 +11,7 @@ exports.create = (req, res) => {
     const firstError = errors.array().map((error) => error.msg)[0];
     return res.status(422).json({ success: false, message: firstError });
   } else {
-    Category.create({ Name: name })
+    Category.create({ Name: name, Icon: req.file.path })
       .then(() => {
         res.status(200).send({
           success: true,
@@ -60,7 +60,7 @@ exports.update = (req, res) => {
             message: "Category not found!",
           });
         } else {
-          data.update({ Name: name });
+          data.update({ Name: name, Icon: req.file.path });
           res.status(200).send({
             success: true,
             message: "Category updated successfully!",

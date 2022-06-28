@@ -11,6 +11,10 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
       unique: true,
     },
+    Icon: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
   });
 
   return Category;
