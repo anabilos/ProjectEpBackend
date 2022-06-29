@@ -26,7 +26,7 @@ exports.getAllUsers = (req, res) => {
 
 exports.getAllProviders = (req, res) => {
   User.findAll({
-    attributes: ["Username", "Email", "Address", "Phone", "Photo"],
+    attributes: ["Id", "Username", "Email", "Address", "Phone", "Photo"],
     include: [
       {
         model: Role,
