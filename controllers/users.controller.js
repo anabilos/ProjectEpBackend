@@ -1,12 +1,12 @@
 const db = require("../models");
 const User = db.User;
 const Role = db.Role;
-const Op = db.Sequelize.Op;
 const Product = db.Product;
 const nodemailer = require("nodemailer");
 const { validationResult } = require("express-validator");
-const { Category } = require("../models");
-const sequlize = require("sequelize");
+const { Category, Order } = require("../models");
+const Sequlize = db.Sequelize;
+const sequelize = db.sequelize;
 
 exports.getAllUsers = (req, res) => {
   User.findAll({
@@ -74,6 +74,40 @@ exports.getProvidersDetails = (req, res) => {
       else {
         res.status(200).send(user);
       }
+    })
+    .catch((err) => {
+      res.status(500).send({
+        success: false,
+        message: err.message,
+      });
+    });
+};
+
+exports.getTopProviders = (req, res) => {
+  Product.findAll({
+    attributes: [
+      "User.Id",
+      "User.Username",
+      "User.Photo",
+      [
+        db.sequelize.fn("COUNT", db.sequelize.col("Product.Id")),
+        "ProductCount",
+      ],
+    ],
+    include: [
+      {
+        model: User,
+        attributes: [],
+        include: [],
+      },
+    ],
+    group: ["User.Username", "User.Id", "User.Photo"],
+    raw: true,
+    order: [[db.Sequelize.literal("ProductCount"), "DESC"]],
+  })
+
+    .then((data) => {
+      res.status(200).send(data);
     })
     .catch((err) => {
       res.status(500).send({

@@ -10,6 +10,7 @@ const {
   getAllProviders,
   getProvidersDetails,
   searchProvidersByCategory,
+  getTopProviders,
 } = require("../controllers/users.controller");
 
 /**
@@ -159,6 +160,21 @@ router.put(
   addToProvider
 );
 
+/**
+ *@swagger
+ * /top-providers:
+ *   get:
+ *     summary: Returns providers sorted by number of products
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: the list of top providers
+ *       500:
+ *         description: internal server error
+ */
+router.get("/top-providers", getTopProviders);
 /**
  *@swagger
  * /send-email-to-admin:
