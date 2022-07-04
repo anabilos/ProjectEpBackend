@@ -50,6 +50,7 @@ exports.getProvidersDetails = (req, res) => {
   const { id } = req.params;
   User.findOne({
     attributes: [
+      "Id",
       "Username",
       "Email",
       "Address",
@@ -85,7 +86,7 @@ exports.getProvidersDetails = (req, res) => {
 exports.searchProvidersByCategory = (req, res) => {
   const { idCategory } = req.params;
   User.findAll({
-    attributes: ["Username", "Email", "Address", "Phone", "Photo"],
+    attributes: ["Id", "Username", "Email", "Address", "Phone", "Photo"],
     include: [
       {
         model: Product,
