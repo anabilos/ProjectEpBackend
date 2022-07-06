@@ -10,7 +10,7 @@ const sequelize = db.sequelize;
 
 exports.getAllUsers = (req, res) => {
   User.findAll({
-    attributes: ["Username", "Email", "Address", "Phone"],
+    attributes: ["Id", "Username", "Email", "Address", "Phone"],
     include: [Role],
   })
     .then((data) => {
